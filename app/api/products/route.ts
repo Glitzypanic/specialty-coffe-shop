@@ -1,6 +1,6 @@
 // app/api/products/route.ts
 import { NextResponse } from 'next/server';
-import connectDB from '@/lib/db';
+import { connectDB } from '@/lib/db';
 import ProductModel from '@/models/Product';
 
 export async function GET() {

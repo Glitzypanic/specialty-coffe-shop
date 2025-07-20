@@ -1,7 +1,8 @@
 // app/layout.tsx
 import type { Metadata } from 'next';
+import { ReactNode } from 'react';
 import './globals.css';
-import Header from '@/components/common/Header';
+import HeaderClient from '@/components/common/HeaderClient';
 import Footer from '@/components/common/Footer';
 import ClientWrapper from '@/components/layout/ClientWrapper';
 
@@ -15,7 +16,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     <html lang="es">
       <body className="min-h-screen flex flex-col">
         <ClientWrapper>
-          <Header />
+          <HeaderClient />
           {children}
         </ClientWrapper>
         <Footer />

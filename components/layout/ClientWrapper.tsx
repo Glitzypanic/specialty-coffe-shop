@@ -1,8 +1,17 @@
+// components/layout/ClientWrapper.tsx
 'use client';
 
-import { ReactNode } from 'react';
-import { CartProvider } from '../ecommerce/CartContext';
+import { SessionProvider } from 'next-auth/react';
+import { CartProvider } from '@/components/ecommerce/CartContext';
 
-export default function ClientWrapper({ children }: { children: ReactNode }) {
-  return <CartProvider>{children}</CartProvider>;
+export default function ClientWrapper({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <SessionProvider>
+      <CartProvider>{children}</CartProvider>
+    </SessionProvider>
+  );
 }
