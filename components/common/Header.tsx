@@ -1,10 +1,13 @@
+// components/common/Header.tsx
 'use client';
 
 import Link from 'next/link';
 import { useCart } from '@/components/ecommerce/CartContext';
+import { signOut, signIn } from 'next-auth/react';
 
-export default function Header() {
+export default function Header({ session }: { session: any }) {
   const { cart } = useCart();
+  const isAuthenticated = session?.user ? true : false;
 
   return (
     <header className="bg-coffee text-cream p-4">
@@ -26,6 +29,33 @@ export default function Header() {
             <Link href="/cart" className="hover:underline" aria-label="Carrito">
               Carrito ({cart.length})
             </Link>
+          </li>
+          <li>
+            {isAuthenticated ? (
+              <button
+                onClick={() => signOut({ callbackUrl: '/' })}
+                className="hover:underline text-cream"
+                aria-label="Cerrar sesión"
+              >
+                Cerrar Sesión
+              </button>
+            ) : (
+              <>
+                <button
+                  onClick={() => signIn()}
+                  className="hover:underline text-cream mr-2"
+                  aria-label="Iniciar sesión"
+                >
+                  Iniciar Sesión
+                </button>
+                <Link
+                  href="/auth/signup"
+                  className="hover:underline text-cream"
+                >
+                  Registrarse
+                </Link>
+              </>
+            )}
           </li>
         </ul>
       </nav>
