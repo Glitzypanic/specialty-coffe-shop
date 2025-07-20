@@ -5,6 +5,7 @@ import './globals.css';
 import HeaderClient from '@/components/common/HeaderClient';
 import Footer from '@/components/common/Footer';
 import ClientWrapper from '@/components/layout/ClientWrapper';
+import { Suspense } from 'react';
 
 export const metadata: Metadata = {
   title: 'Coffee Shop',
@@ -16,7 +17,13 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     <html lang="es">
       <body className="min-h-screen flex flex-col">
         <ClientWrapper>
-          <HeaderClient />
+          <Suspense
+            fallback={
+              <div className="bg-coffee text-cream p-4">Cargando header...</div>
+            }
+          >
+            <HeaderClient />
+          </Suspense>
           {children}
         </ClientWrapper>
         <Footer />
