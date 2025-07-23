@@ -3,9 +3,20 @@
 
 import Link from 'next/link';
 import { useCart } from '@/components/ecommerce/CartContext';
-import { signOut, signIn } from 'next-auth/react';
+import { signIn } from 'next-auth/react';
 
-export default function Header({ session }: { session: any }) {
+interface SessionUser {
+  name?: string;
+  email?: string;
+  image?: string;
+  id?: string;
+}
+
+interface Session {
+  user?: SessionUser;
+}
+
+export default function Header({ session }: { session: Session }) {
   const { cart } = useCart();
   const isAuthenticated = session?.user ? true : false;
 
@@ -32,13 +43,13 @@ export default function Header({ session }: { session: any }) {
           </li>
           <li>
             {isAuthenticated ? (
-              <button
-                onClick={() => signOut({ callbackUrl: '/' })}
+              <Link
+                href="/profile"
                 className="hover:underline text-cream"
-                aria-label="Cerrar sesión"
+                aria-label="Mi cuenta"
               >
-                Cerrar Sesión
-              </button>
+                Mi cuenta
+              </Link>
             ) : (
               <>
                 <button

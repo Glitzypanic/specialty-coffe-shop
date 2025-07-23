@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useCart } from '@/components/ecommerce/CartContext';
-import { signOut, signIn, useSession } from 'next-auth/react';
+import { signIn, useSession } from 'next-auth/react';
 
 export default function HeaderClient() {
   const { data: session, status } = useSession();
@@ -38,13 +38,13 @@ export default function HeaderClient() {
             {loading ? (
               <span>Cargando...</span>
             ) : isAuthenticated ? (
-              <button
-                onClick={() => signOut({ callbackUrl: '/' })}
+              <Link
+                href="/profile"
                 className="hover:underline text-cream"
-                aria-label="Cerrar sesión"
+                aria-label="Mi cuenta"
               >
-                Cerrar Sesión
-              </button>
+                Mi cuenta
+              </Link>
             ) : (
               <>
                 <button
