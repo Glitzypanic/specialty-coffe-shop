@@ -5,13 +5,24 @@ import User from '@/models/User';
 import ProductModel from '@/models/Product';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { CartSchema, ApiError, CartErrorCodes } from '@/lib/validations/cart';
+import {
+  handleApiError,
+  validateAuthentication,
+} from '@/lib/utils/api-error-handler';
 
+/**
+ * Obtiene el carrito del usuario autenticado
+ */
 export async function GET() {
   try {
     await connectDB();
     const session = await getServerSession(authOptions);
-    if (!session?.user?.email)
+
+    // Permitir acceso sin autenticación, devolver carrito vacío
+    if (!session?.user?.email) {
       return NextResponse.json({ cart: [] }, { status: 200 });
+    }
 
     const user = await User.findOne({ email: session.user.email }).select(
       'cart'
@@ -20,7 +31,7 @@ export async function GET() {
       return NextResponse.json({ cart: [] }, { status: 200 });
     }
 
-    // Populate cart with full product data
+    // Poblar carrito con datos completos del producto y filtrar productos inválidos
     const populatedCart = [];
     for (const cartItem of user.cart) {
       const product = await ProductModel.findById(cartItem.product);
@@ -34,43 +45,74 @@ export async function GET() {
 
     return NextResponse.json({ cart: populatedCart }, { status: 200 });
   } catch (error) {
-    console.error('Cart GET error:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch cart' },
-      { status: 500 }
-    );
+    return handleApiError(error);
   }
 }
 
+/**
+ * Actualiza el carrito del usuario autenticado
+ */
 export async function POST(request: Request) {
   try {
     await connectDB();
     const session = await getServerSession(authOptions);
-    if (!session?.user?.email)
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-    const { cart } = await request.json();
-    const user = await User.findOne({ email: session.user.email });
-    if (!user)
-      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    // Validar autenticación
+    validateAuthentication(session);
 
-    // Validate that all products exist and store only the IDs
+    // Validar datos de entrada
+    const body = await request.json();
+    const validatedData = CartSchema.parse(body);
+
+    const user = await User.findOne({ email: session!.user!.email });
+    if (!user) {
+      throw new ApiError(404, 'User not found', CartErrorCodes.USER_NOT_FOUND);
+    }
+
+    // Validar que todos los productos existan y crear carrito válido
     const validCart = [];
-    for (const item of cart || []) {
-      const productId = item.product._id || item.product;
+    const invalidProducts = [];
+
+    for (const item of validatedData.cart) {
+      const productId =
+        typeof item.product === 'string' ? item.product : item.product._id;
       const product = await ProductModel.findById(productId);
+
       if (product) {
-        validCart.push({
-          product: productId,
-          quantity: Math.max(1, item.quantity || 1),
+        // Verificar stock disponible
+        if (product.stock >= item.quantity) {
+          validCart.push({
+            product: productId,
+            quantity: item.quantity,
+          });
+        } else {
+          invalidProducts.push({
+            productId,
+            reason: `Insufficient stock. Available: ${product.stock}, requested: ${item.quantity}`,
+          });
+        }
+      } else {
+        invalidProducts.push({
+          productId,
+          reason: 'Product not found',
         });
       }
     }
 
+    // Si hay productos inválidos, devolver error con detalles
+    if (invalidProducts.length > 0) {
+      throw new ApiError(
+        400,
+        'Some products are invalid or unavailable',
+        CartErrorCodes.INVALID_PRODUCT
+      );
+    }
+
+    // Actualizar carrito del usuario
     user.cart = validCart;
     await user.save();
 
-    // Return the populated cart
+    // Devolver carrito poblado
     const populatedCart = [];
     for (const cartItem of validCart) {
       const product = await ProductModel.findById(cartItem.product);
@@ -84,10 +126,6 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ cart: populatedCart }, { status: 200 });
   } catch (error) {
-    console.error('Cart POST error:', error);
-    return NextResponse.json(
-      { error: 'Failed to update cart' },
-      { status: 500 }
-    );
+    return handleApiError(error);
   }
 }

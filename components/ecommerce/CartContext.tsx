@@ -8,28 +8,58 @@ import {
   useEffect,
   ReactNode,
   useCallback,
+  useMemo,
 } from 'react';
 import { useSession } from 'next-auth/react';
 import { Product } from '@/types/product';
 
+/**
+ * Representa un item en el carrito de compras
+ */
 export interface CartItem {
   product: Product;
   quantity: number;
 }
 
+/**
+ * Tipo del contexto del carrito
+ */
 interface CartContextType {
   cart: CartItem[];
   addToCart: (product: Product) => void;
   removeFromCart: (productId: string) => void;
   updateQuantity: (productId: string, quantity: number) => void;
   clearCart: () => void;
+  isLoading: boolean;
+  totalItems: number;
+  totalPrice: number;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
+/**
+ * Proveedor del contexto del carrito de compras
+ * Maneja la sincronización entre localStorage y servidor según el estado de autenticación
+ */
 export function CartProvider({ children }: { children: ReactNode }) {
   const [cart, setCart] = useState<CartItem[]>([]);
-  const { data: session, status } = useSession();
+  const [isLoading, setIsLoading] = useState(true);
+  const { status } = useSession();
+
+  // Valores calculados usando useMemo para evitar re-cálculos innecesarios
+  const totalItems = useMemo(
+    () => cart.reduce((total, item) => total + item.quantity, 0),
+    [cart]
+  );
+
+  const totalPrice = useMemo(
+    () =>
+      cart.reduce(
+        (total, item) => total + item.product.price * item.quantity,
+        0
+      ),
+    [cart]
+  );
 
   // Cargar carrito desde localStorage
   const loadLocalCart = useCallback(() => {
@@ -70,43 +100,50 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const migrateCartToServer = useCallback(
     async (localCart: CartItem[]) => {
       try {
-        if (localCart.length > 0) {
-          // Primero obtener el carrito existente del servidor
-          const serverCart = await loadServerCart();
-
-          // Combinar carritos
-          const combinedCart = [...serverCart];
-
-          localCart.forEach((localItem) => {
-            const existingIndex = combinedCart.findIndex(
-              (serverItem) => serverItem.product._id === localItem.product._id
-            );
-
-            if (existingIndex !== -1) {
-              // Producto ya existe, sumar cantidades
-              combinedCart[existingIndex].quantity += localItem.quantity;
-            } else {
-              // Producto nuevo, agregarlo
-              combinedCart.push(localItem);
-            }
-          });
-
-          // Guardar el carrito combinado en el servidor
-          await fetch('/api/cart', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ cart: combinedCart }),
-          });
-
-          // Limpiar localStorage después de migrar
-          localStorage.removeItem('cart');
-
-          // Retornar el carrito combinado
-          return combinedCart;
+        if (localCart.length === 0) {
+          // Si no hay carrito local, solo cargar del servidor
+          return await loadServerCart();
         }
 
-        // Si no hay carrito local, solo cargar del servidor
-        return await loadServerCart();
+        // Obtener el carrito existente del servidor
+        const serverCart = await loadServerCart();
+
+        // Crear un mapa para facilitar la combinación
+        const cartMap = new Map<string, CartItem>();
+
+        // Agregar items del servidor al mapa
+        serverCart.forEach((item: CartItem) => {
+          cartMap.set(item.product._id, item);
+        });
+
+        // Combinar o agregar items del carrito local
+        localCart.forEach((localItem: CartItem) => {
+          const existingItem = cartMap.get(localItem.product._id);
+          if (existingItem) {
+            // Producto ya existe, sumar cantidades
+            cartMap.set(localItem.product._id, {
+              ...existingItem,
+              quantity: existingItem.quantity + localItem.quantity,
+            });
+          } else {
+            // Producto nuevo, agregarlo
+            cartMap.set(localItem.product._id, localItem);
+          }
+        });
+
+        const combinedCart = Array.from(cartMap.values());
+
+        // Guardar el carrito combinado en el servidor
+        await fetch('/api/cart', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ cart: combinedCart }),
+        });
+
+        // Limpiar localStorage después de migrar
+        localStorage.removeItem('cart');
+
+        return combinedCart;
       } catch (error) {
         console.error('Error migrating cart to server:', error);
         // En caso de error, al menos retornar el carrito del servidor
@@ -121,17 +158,26 @@ export function CartProvider({ children }: { children: ReactNode }) {
     const initializeCart = async () => {
       if (status === 'loading') return;
 
-      if (status === 'authenticated') {
-        // Usuario autenticado
-        const localCart = loadLocalCart();
-
-        // Migrar y combinar carritos
-        const finalCart = await migrateCartToServer(localCart);
-        setCart(finalCart);
-      } else {
-        // Usuario no autenticado - usar localStorage
+      setIsLoading(true);
+      try {
+        if (status === 'authenticated') {
+          // Usuario autenticado
+          const localCart = loadLocalCart();
+          // Migrar y combinar carritos
+          const finalCart = await migrateCartToServer(localCart);
+          setCart(finalCart);
+        } else {
+          // Usuario no autenticado - usar localStorage
+          const localCart = loadLocalCart();
+          setCart(localCart);
+        }
+      } catch (error) {
+        console.error('Error initializing cart:', error);
+        // En caso de error, usar localStorage como fallback
         const localCart = loadLocalCart();
         setCart(localCart);
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -160,9 +206,23 @@ export function CartProvider({ children }: { children: ReactNode }) {
     [status, saveLocalCart]
   );
 
+  /**
+   * Validar si un producto es válido
+   */
+  const isValidProduct = useCallback((product: Product): boolean => {
+    return !!(
+      product &&
+      product._id &&
+      typeof product._id === 'string' &&
+      product.name &&
+      typeof product.price === 'number' &&
+      product.price > 0
+    );
+  }, []);
+
   const addToCart = useCallback(
     (product: Product) => {
-      if (!product || !product._id || typeof product._id !== 'string') {
+      if (!isValidProduct(product)) {
         console.error('Invalid product:', product);
         return;
       }
@@ -183,12 +243,23 @@ export function CartProvider({ children }: { children: ReactNode }) {
         return newCart;
       });
     },
-    [saveCart]
+    [saveCart, isValidProduct]
   );
+
+  /**
+   * Validar si un ID de producto es válido
+   */
+  const isValidProductId = useCallback((productId: string): boolean => {
+    return !!(
+      productId &&
+      typeof productId === 'string' &&
+      productId.trim().length > 0
+    );
+  }, []);
 
   const removeFromCart = useCallback(
     (productId: string) => {
-      if (!productId || typeof productId !== 'string') {
+      if (!isValidProductId(productId)) {
         console.error('Invalid productId:', productId);
         return;
       }
@@ -201,12 +272,16 @@ export function CartProvider({ children }: { children: ReactNode }) {
         return newCart;
       });
     },
-    [saveCart]
+    [saveCart, isValidProductId]
   );
 
   const updateQuantity = useCallback(
     (productId: string, quantity: number) => {
-      if (!productId || typeof productId !== 'string' || quantity < 1) {
+      if (
+        !isValidProductId(productId) ||
+        quantity < 1 ||
+        !Number.isInteger(quantity)
+      ) {
         console.error('Invalid parameters:', { productId, quantity });
         return;
       }
@@ -221,21 +296,37 @@ export function CartProvider({ children }: { children: ReactNode }) {
         return newCart;
       });
     },
-    [saveCart]
+    [saveCart, isValidProductId]
   );
 
-  const clearCart = useCallback(() => {
+  /**
+   * Limpiar todo el carrito
+   */
+  const clearCart = useCallback(async () => {
     setCart([]);
-    if (status === 'authenticated') {
-      saveCart([]);
-    } else {
-      localStorage.removeItem('cart');
+    try {
+      if (status === 'authenticated') {
+        await saveCart([]);
+      } else {
+        localStorage.removeItem('cart');
+      }
+    } catch (error) {
+      console.error('Error clearing cart:', error);
     }
   }, [saveCart, status]);
 
   return (
     <CartContext.Provider
-      value={{ cart, addToCart, removeFromCart, updateQuantity, clearCart }}
+      value={{
+        cart,
+        addToCart,
+        removeFromCart,
+        updateQuantity,
+        clearCart,
+        isLoading,
+        totalItems,
+        totalPrice,
+      }}
     >
       {children}
     </CartContext.Provider>

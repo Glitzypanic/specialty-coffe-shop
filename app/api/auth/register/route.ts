@@ -7,9 +7,9 @@ import bcrypt from 'bcryptjs';
 export async function POST(request: Request) {
   try {
     await connectDB();
-    const { name, email, password } = await request.json();
+    const { name, email, password, phone } = await request.json();
 
-    if (!name || !email || !password) {
+    if (!name || !email || !password || !phone) {
       return NextResponse.json(
         { error: 'Todos los campos son requeridos' },
         { status: 400 }
@@ -25,7 +25,7 @@ export async function POST(request: Request) {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    await User.create({ name, email, password: hashedPassword });
+    await User.create({ name, email, password: hashedPassword, phone });
 
     return NextResponse.json(
       { message: 'Usuario registrado exitosamente' },
