@@ -39,7 +39,9 @@ export default function AccountSection({ user }: AccountSectionProps) {
     // Validación de formato de teléfono internacional (ej: +52 1234567890)
     const phoneRegex = /^\+\d{1,3}\s?\d{6,14}$/;
     if (!phoneRegex.test(form.phone)) {
-      setError('El teléfono debe incluir el código de país y ser válido. Ejemplo: +52 1234567890');
+      setError(
+        'El teléfono debe incluir el código de país y ser válido. Ejemplo: +52 1234567890'
+      );
       setLoading(false);
       return;
     }

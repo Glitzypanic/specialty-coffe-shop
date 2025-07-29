@@ -22,7 +22,10 @@ export async function POST(request: Request) {
     const phoneRegex = /^\+\d{1,3}\s?\d{6,14}$/;
     if (!phoneRegex.test(phone)) {
       return NextResponse.json(
-        { error: 'El teléfono debe incluir el código de país y ser válido. Ejemplo: +52 1234567890' },
+        {
+          error:
+            'El teléfono debe incluir el código de país y ser válido. Ejemplo: +52 1234567890',
+        },
         { status: 400 }
       );
     }
