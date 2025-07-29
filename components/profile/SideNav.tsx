@@ -13,7 +13,7 @@ export default function SideNav() {
         Mi cuenta
       </Link>
       <Link
-        href="/profile?section=orders"
+        href="/profile/orders"
         className="font-semibold text-lg hover:text-blue-600"
       >
         Historial de compras

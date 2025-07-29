@@ -587,13 +587,31 @@ export default function CheckoutPage() {
                   Anterior
                 </button>
                 <button
-                  onClick={() => {
+                  onClick={async () => {
                     setIsSubmitting(true);
-                    setTimeout(() => {
+                    try {
+                      const res = await fetch('/api/checkout', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                          cart: cart.map((item) => ({
+                            product: { name: item.product.name },
+                            quantity: item.quantity,
+                          })),
+                          total: Number((total * 1.16).toFixed(2)),
+                        }),
+                      });
+                      if (!res.ok)
+                        throw new Error('Error al procesar el pedido');
                       clearCart();
                       alert('¡Pedido confirmado! Gracias por tu compra.');
                       window.location.href = '/products';
-                    }, 1000);
+                    } catch (err) {
+                      alert(
+                        'Hubo un error al procesar el pedido. Intenta de nuevo.'
+                      );
+                    }
+                    setIsSubmitting(false);
                   }}
                   disabled={isSubmitting}
                   className="bg-green-600 text-white py-2 px-6 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 disabled:opacity-50"

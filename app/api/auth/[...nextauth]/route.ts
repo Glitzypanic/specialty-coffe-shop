@@ -5,6 +5,29 @@ import { connectDB } from '@/lib/db';
 import User from '@/models/User';
 import bcrypt from 'bcryptjs';
 
+// Extend NextAuth types
+declare module 'next-auth' {
+  interface User {
+    phone?: number | null;
+  }
+
+  interface Session {
+    user: {
+      id: string;
+      name: string;
+      email: string;
+      phone: number | null;
+    };
+  }
+}
+
+declare module 'next-auth/jwt' {
+  interface JWT {
+    id: string;
+    phone: number | null;
+  }
+}
+
 export const authOptions: NextAuthOptions = {
   providers: [
     CredentialsProvider({
@@ -23,7 +46,12 @@ export const authOptions: NextAuthOptions = {
         if (!user || !(await bcrypt.compare(password, user.password))) {
           return null; // Devuelve null para indicar fallo
         }
-        return { id: user._id, name: user.name, email: user.email }; // Datos del usuario
+        return {
+          id: user._id,
+          name: user.name,
+          email: user.email,
+          phone: user.phone ?? null,
+        };
       },
     }),
   ],
@@ -36,6 +64,7 @@ export const authOptions: NextAuthOptions = {
         token.id = user.id;
         token.name = user.name;
         token.email = user.email;
+        token.phone = user.phone ?? null;
       }
       return token;
     },
@@ -45,6 +74,7 @@ export const authOptions: NextAuthOptions = {
           id: token.id as string,
           name: token.name as string,
           email: token.email as string,
+          phone: token.phone as number | null,
         };
       }
       return session;

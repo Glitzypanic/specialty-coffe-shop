@@ -1,7 +1,7 @@
 // app/products/[id]/page.tsx
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
-import connectDB from '@/lib/db';
+import { connectDB } from '@/lib/db';
 import ProductModel from '@/models/Product';
 import { Product } from '@/types/product';
 
