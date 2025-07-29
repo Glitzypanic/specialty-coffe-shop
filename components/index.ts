@@ -15,6 +15,7 @@ export { default as Footer } from './common/Footer';
 export { CartProvider, useCart } from './ecommerce/CartContext';
 export { default as Cart } from './ecommerce/Cart';
 export { default as ProductCard } from './ecommerce/ProductCard';
+export { default as FeaturedProducts } from './ecommerce/FeaturedProducts';
 
 // Checkout components
 export { default as ContactForm } from './checkout/ContactForm';
