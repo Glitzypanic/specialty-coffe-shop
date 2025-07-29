@@ -158,7 +158,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <link rel="manifest" href="/site.webmanifest" />
       </head>
 
-      <body className="min-h-full flex flex-col bg-gray-50 text-gray-900 antialiased">
+      <body className="min-h-full flex flex-col bg-background text-foreground antialiased">
         <ClientWrapper>
           <Suspense fallback={<HeaderSkeleton />}>
             <HeaderClient />

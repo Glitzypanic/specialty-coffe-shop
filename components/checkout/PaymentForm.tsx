@@ -1,4 +1,6 @@
 // components/checkout/PaymentForm.tsx
+'use client';
+
 import { useState } from 'react';
 
 interface PaymentData {

@@ -1,4 +1,6 @@
 // components/checkout/OrderSummary.tsx
+'use client';
+
 import Image from 'next/image';
 import { useCart } from '@/components/ecommerce/CartContext';
 import {
