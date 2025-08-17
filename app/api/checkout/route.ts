@@ -3,7 +3,7 @@ import { connectDB } from '@/lib/db';
 import User from '@/models/User';
 import Order from '@/models/Order';
 import { getServerSession } from 'next-auth/next';
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { authOptions } from '@/lib/auth';
 
 export async function POST(request: Request) {
   try {

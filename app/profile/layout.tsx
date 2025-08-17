@@ -7,7 +7,7 @@ export default function ProfileLayout({
 }) {
   return (
     <div className="flex min-h-screen">
-      <aside className="w-64 bg-gray-100 border-r">
+      <aside>
         <SideNav />
       </aside>
       <main className="flex-1 p-8">{children}</main>

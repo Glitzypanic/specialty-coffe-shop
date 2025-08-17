@@ -1,6 +1,6 @@
 // app/page.tsx
 import Link from 'next/link';
-import { FeaturedProducts } from '@/components';
+import FeaturedProducts from '@/components/ecommerce/FeaturedProducts';
 import { Product } from '@/types/product';
 
 function getSampleProducts(): Product[] {
@@ -68,7 +68,7 @@ export default function Home() {
   return (
     <main className="container mx-auto p-4">
       <section className="text-center py-12">
-        <h1 className="text-4xl font-bold text-coffee">
+        <h1 className="text-4xl font-bold text-sky-900">
           Bienvenido a Coffee Shop
         </h1>
         <p className="text-lg text-gray-600 mt-4">

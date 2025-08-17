@@ -80,18 +80,18 @@ export default function AccountSection({ user }: AccountSectionProps) {
             className="w-16 h-16 rounded-full border"
           />
         )}
-        <div>
-          <div>
+        <div className="flex flex-col w-full">
+          <div className="flex flex-row gap-4">
             <div className="font-semibold text-lg">Nombre:</div>
-            <div className="text-gray-600">{display.name}</div>
+            <div className="text-gray-400 text-xl">{display.name}</div>
           </div>
-          <div>
+          <div className="flex flex-row gap-4 ">
             <div className="font-semibold text-lg">Correo:</div>
-            <div className="text-gray-600">{display.email}</div>
+            <div className="text-gray-400 text-xl">{display.email}</div>
           </div>
-          <div>
+          <div className="flex flex-row gap-4">
             <div className="font-semibold text-lg">Telefono:</div>
-            <div className="text-gray-600">{display.phone}</div>
+            <div className="text-gray-400 text-xl">{display.phone}</div>
           </div>
         </div>
       </div>
@@ -99,7 +99,7 @@ export default function AccountSection({ user }: AccountSectionProps) {
         <div>
           <label
             htmlFor="name"
-            className="block text-sm font-medium text-gray-700"
+            className="block text-sm font-medium text-gray-400"
           >
             Nombre
           </label>
@@ -116,7 +116,7 @@ export default function AccountSection({ user }: AccountSectionProps) {
         <div>
           <label
             htmlFor="email"
-            className="block text-sm font-medium text-gray-700"
+            className="block text-sm font-medium text-gray-400"
           >
             Correo Electrónico
           </label>
@@ -133,7 +133,7 @@ export default function AccountSection({ user }: AccountSectionProps) {
         <div>
           <label
             htmlFor="phone"
-            className="block text-sm font-medium text-gray-700"
+            className="block text-sm font-medium text-gray-400"
           >
             Teléfono
           </label>
@@ -150,7 +150,7 @@ export default function AccountSection({ user }: AccountSectionProps) {
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-coffee text-white py-2 rounded-md hover:bg-coffee-dark focus:outline-none focus:ring-2 focus:ring-coffee focus:ring-opacity-50 disabled:bg-gray-400"
+          className="w-full bg-coffee text-white py-2 rounded-md hover:bg-coffee-dark focus:outline-none focus:ring-2 focus:ring-coffee focus:ring-opacity-50 disabled:bg-gray-400 cursor-pointer j"
         >
           {loading ? 'Guardando...' : 'Guardar cambios'}
         </button>

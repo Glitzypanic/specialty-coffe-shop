@@ -1,4 +1,5 @@
 // app/products/[id]/page.tsx
+import React from 'react';
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import { connectDB } from '@/lib/db';
@@ -12,10 +13,12 @@ async function fetchProduct(id: string): Promise<Product | null> {
 }
 
 interface ProductPageProps {
-  params: { id: string };
+  params: any;
 }
 
-export default async function ProductPage({ params }: ProductPageProps) {
+export default async function ProductPage({
+  params,
+}: ProductPageProps): Promise<React.ReactNode> {
   const product = await fetchProduct(params.id);
 
   if (!product) {

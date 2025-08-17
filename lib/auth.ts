@@ -1,34 +1,11 @@
-// app/api/auth/[...nextauth]/route.ts
-import NextAuth, { NextAuthOptions } from 'next-auth';
+import { NextAuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import { connectDB } from '@/lib/db';
 import User from '@/models/User';
 import bcrypt from 'bcryptjs';
 
-// Extend NextAuth types
-declare module 'next-auth' {
-  interface User {
-    phone?: number | null;
-  }
-
-  interface Session {
-    user: {
-      id: string;
-      name: string;
-      email: string;
-      phone: number | null;
-    };
-  }
-}
-
-declare module 'next-auth/jwt' {
-  interface JWT {
-    id: string;
-    phone: number | null;
-  }
-}
-
-const authOptions: NextAuthOptions = {
+// Reuse same session/callback logic as in the NextAuth route
+export const authOptions: NextAuthOptions = {
   providers: [
     CredentialsProvider({
       name: 'Credentials',
@@ -44,7 +21,7 @@ const authOptions: NextAuthOptions = {
         };
         const user = await User.findOne({ email });
         if (!user || !(await bcrypt.compare(password, user.password))) {
-          return null; // Devuelve null para indicar fallo
+          return null;
         }
         return {
           id: user._id,
@@ -55,35 +32,28 @@ const authOptions: NextAuthOptions = {
       },
     }),
   ],
-  session: {
-    strategy: 'jwt', // Usa JWT para sesiones ligeras y rápidas
-  },
+  session: { strategy: 'jwt' },
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        token.id = user.id;
-        token.name = user.name;
-        token.email = user.email;
-        token.phone = user.phone ?? null;
+        token.id = (user as any).id;
+        token.name = (user as any).name;
+        token.email = (user as any).email;
+        token.phone = (user as any).phone ?? null;
       }
       return token;
     },
     async session({ session, token }) {
       if (token) {
         session.user = {
-          id: token.id as string,
-          name: token.name as string,
-          email: token.email as string,
-          phone: token.phone as number | null,
+          id: (token as any).id as string,
+          name: (token as any).name as string,
+          email: (token as any).email as string,
+          phone: (token as any).phone as number | null,
         };
       }
       return session;
     },
   },
-  pages: {
-    signIn: '/auth/signin', // Redirige a la página de login si falla
-  },
+  pages: { signIn: '/auth/signin' },
 };
-
-const handler = NextAuth(authOptions);
-export { handler as GET, handler as POST };

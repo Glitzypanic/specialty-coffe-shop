@@ -1,5 +1,7 @@
 // components/common/FormInput.tsx
-import React, { forwardRef, InputHTMLAttributes } from 'react';
+'use client';
+
+import React, { forwardRef, InputHTMLAttributes, useId, useRef } from 'react';
 
 /**
  * Props para el componente FormInput
@@ -39,7 +41,14 @@ export const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
     },
     ref
   ) => {
-    const inputId = id || `input-${Math.random().toString(36).substr(2, 9)}`;
+    // Prefer React's useId (stable between SSR and client hydration).
+    // If not provided via props, fallback to useId and then to useRef.
+    const reactId = useId?.() || undefined;
+    const refId = useRef<string | null>(null);
+    if (!refId.current) {
+      refId.current = `input-${Math.random().toString(36).slice(2, 9)}`;
+    }
+    const inputId = id || reactId || refId.current!;
     const hasError = Boolean(error);
 
     const defaultInputClasses = [

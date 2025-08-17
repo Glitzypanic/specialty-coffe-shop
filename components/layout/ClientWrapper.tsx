@@ -1,9 +1,7 @@
-// components/layout/ClientWrapper.tsx
 'use client';
 
 import { SessionProvider } from 'next-auth/react';
 import { CartProvider } from '@/components/ecommerce/CartContext';
-import { ThemeProvider } from '@/components/theme/ThemeProvider';
 
 export default function ClientWrapper({
   children,
@@ -12,9 +10,7 @@ export default function ClientWrapper({
 }) {
   return (
     <SessionProvider>
-      <ThemeProvider>
-        <CartProvider>{children}</CartProvider>
-      </ThemeProvider>
+      <CartProvider>{children}</CartProvider>
     </SessionProvider>
   );
 }

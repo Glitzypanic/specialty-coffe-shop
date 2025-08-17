@@ -1,13 +1,17 @@
 'use client';
 
+import React from 'react';
+import useMounted from '@/hooks/useMounted';
 import Link from 'next/link';
 import { signOut } from 'next-auth/react';
 import { usePathname } from 'next/navigation';
 
 export default function SideNav() {
   const pathname = usePathname();
+  const mounted = useMounted();
 
   const isActive = (path: string) => {
+    if (!mounted) return false; // prevent relying on pathname during SSR
     if (path === '/profile') {
       return pathname === '/profile';
     }
@@ -15,12 +19,11 @@ export default function SideNav() {
   };
 
   const getLinkStyles = (path: string) => {
-    const baseStyles =
-      'font-semibold text-lg transition-colors duration-200 px-4 py-2 rounded-lg';
+    const baseStyles = 'font-semibold text-lg px-4 py-2 rounded-lg outline';
     if (isActive(path)) {
-      return `${baseStyles} p-2 bg-green text-white`;
+      return `${baseStyles} font-bold`;
     }
-    return `${baseStyles} text-gray-700 hover:text-coffee hover:bg-gray-100`;
+    return `${baseStyles} text-gray-400 hover:text-black`;
   };
 
   return (

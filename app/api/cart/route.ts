@@ -4,7 +4,7 @@ import { connectDB } from '@/lib/db';
 import User from '@/models/User';
 import ProductModel from '@/models/Product';
 import { getServerSession } from 'next-auth/next';
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { authOptions } from '@/lib/auth';
 import { CartSchema, ApiError, CartErrorCodes } from '@/lib/validations/cart';
 import {
   handleApiError,

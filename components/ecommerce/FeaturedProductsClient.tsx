@@ -18,13 +18,13 @@ export default function FeaturedProductsClient({
   }
 
   return (
-    <section className="py-12 bg-gray-50 dark:bg-gray-800 transition-colors duration-300">
+    <section className="py-12 bg-gray-50 transition-colors duration-300">
       <div className="container mx-auto px-4">
         <div className="text-center mb-8">
-          <h2 className="text-3xl font-bold text-coffee dark:text-cream mb-4">
+          <h2 className="text-3xl font-bold text-coffee mb-4">
             Productos Destacados
           </h2>
-          <p className="text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+          <p className="text-gray-600 max-w-2xl mx-auto">
             Descubre nuestra selección especial de cafés de especialidad y
             accesorios seleccionados cuidadosamente para ti.
           </p>

@@ -11,8 +11,8 @@ interface ProductCardProps {
 
 // Placeholder component for missing images
 const ProductImagePlaceholder = ({ name }: { name: string }) => (
-  <div className="w-full h-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
-    <div className="text-center text-gray-500 dark:text-gray-400">
+  <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+    <div className="text-center text-gray-500">
       <svg
         className="mx-auto h-12 w-12 mb-2"
         fill="none"
@@ -35,7 +35,7 @@ export default function ProductCardClient({ product }: ProductCardProps) {
   const { addToCart } = useCart();
 
   return (
-    <article className="border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 rounded-lg shadow-md hover:shadow-lg transition-all duration-300">
+    <article className="border border-gray-200 bg-white rounded-lg shadow-md hover:shadow-lg transition-all duration-300">
       <Link
         href={`/products/${product._id}`}
         aria-label={`Ver detalles de ${product.name}`}
@@ -58,20 +58,18 @@ export default function ProductCardClient({ product }: ProductCardProps) {
           )}
         </div>
         <div className="p-4">
-          <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-100">
+          <h2 className="text-lg font-semibold text-gray-800">
             {product.name}
           </h2>
-          <p className="text-sm text-gray-600 dark:text-gray-300">
-            {product.description}
-          </p>
-          <p className="text-lg font-bold text-green-600 dark:text-green-400 mt-2">
+          <p className="text-sm text-gray-600">{product.description}</p>
+          <p className="text-lg font-bold text-green-600 mt-2">
             ${product.price}
           </p>
         </div>
       </Link>
       <button
         onClick={() => addToCart(product)}
-        className="w-full bg-coffee dark:bg-green-600 text-white py-2 rounded-b-md hover:bg-coffee/90 dark:hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-coffee dark:focus:ring-green-400 focus:ring-opacity-50 transition-colors duration-200"
+        className="w-full bg-coffee text-white py-2 rounded-b-md hover:bg-coffee/90 focus:outline-none focus:ring-2 focus:ring-coffee focus:ring-opacity-50 transition-colors duration-200"
         aria-label={`Añadir ${product.name} al carrito`}
       >
         Añadir al carrito

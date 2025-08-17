@@ -45,7 +45,7 @@ export default function Cart() {
               />
               <button
                 onClick={() => removeFromCart(item.product._id)}
-                className="ml-2 text-red-500 hover:text-red-700"
+                className="ml-2 text-red-500 hover:text-red-700 cursor-pointer"
                 aria-label={`Eliminar ${item.product.name} del carrito`}
               >
                 Eliminar
@@ -55,17 +55,17 @@ export default function Cart() {
         ))}
       </ul>
       <div className="mt-4 text-right">
-        <p className="text-xl font-bold">Total: ${total.toFixed(2)}</p>
+        <p className="text-xl font-bold mb-2">Total: ${total.toFixed(2)}</p>
         <button
           onClick={clearCart}
-          className="mt-2 bg-red-500 text-white py-1 px-3 rounded hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-opacity-50"
+          className="bg-red-500 cursor-pointer text-white text-lg px-3 py-1 rounded hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-opacity-50"
           aria-label="Vaciar carrito"
         >
           Vaciar Carrito
         </button>
         <Link
           href="/checkout"
-          className="ml-2 bg-green-500 text-white py-1 px-3 rounded hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-opacity-50"
+          className="bg-green-500 cursor-pointer text-white text-lg px-3 py-[7px] rounded hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-opacity-50"
           aria-label="Ir al checkout"
         >
           Ir al Checkout

@@ -1,9 +1,8 @@
-'use client'; // Sin espacios ni comentarios antes de esta línea
+'use client';
 
 import Link from 'next/link';
 import { useCart } from '@/components/ecommerce/CartContext';
 import { signIn, useSession } from 'next-auth/react';
-import ThemeToggle from '../theme/ThemeToggle';
 
 /**
  * Componente Header del lado del cliente
@@ -72,7 +71,6 @@ export default function HeaderClient() {
               )}
             </li>
           </ul>
-          <ThemeToggle />
         </div>
       </nav>
     </header>

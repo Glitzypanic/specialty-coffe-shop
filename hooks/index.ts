@@ -9,9 +9,6 @@ export { useCheckout } from './useCheckout';
 // Performance hooks
 export { useDebounce, useDebouncedCallback } from './useDebounce';
 
-// Theme hooks
-export { useTheme } from './useTheme';
-
 // Re-export commonly used React hooks for convenience
 export {
   useState,
@@ -21,3 +18,6 @@ export {
   useRef,
   useContext,
 } from 'react';
+
+// Export useMounted helper
+export { default as useMounted } from './useMounted';

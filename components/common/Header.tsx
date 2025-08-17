@@ -4,7 +4,6 @@
 import Link from 'next/link';
 import { useCart } from '@/components/ecommerce/CartContext';
 import { signIn } from 'next-auth/react';
-import ThemeToggle from '@/components/theme/ThemeToggle';
 
 interface SessionUser {
   name?: string;
@@ -76,9 +75,6 @@ export default function Header({ session }: { session: Session }) {
               )}
             </li>
           </ul>
-
-          {/* Theme Toggle */}
-          <ThemeToggle />
         </div>
       </nav>
     </header>

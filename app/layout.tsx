@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import { ReactNode } from 'react';
 import './globals.css';
 import HeaderClient from '@/components/common/HeaderClient';
+import ThirdPartyScripts from '@/components/common/ThirdPartyScripts';
 import Footer from '@/components/common/Footer';
 import ClientWrapper from '@/components/layout/ClientWrapper';
 import { Suspense } from 'react';
@@ -169,30 +170,10 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           <Footer />
         </ClientWrapper>
 
-        {/* Scripts de terceros cargados de forma optimizada */}
-        {process.env.NODE_ENV === 'production' && (
-          <>
-            {/* Google Analytics u otros scripts de analytics aquí */}
-            {process.env.NEXT_PUBLIC_GA_ID && (
-              <>
-                <script
-                  async
-                  src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_ID}`}
-                />
-                <script
-                  dangerouslySetInnerHTML={{
-                    __html: `
-                      window.dataLayer = window.dataLayer || [];
-                      function gtag(){dataLayer.push(arguments);}
-                      gtag('js', new Date());
-                      gtag('config', '${process.env.NEXT_PUBLIC_GA_ID}');
-                    `,
-                  }}
-                />
-              </>
-            )}
-          </>
-        )}
+        {/* Scripts de terceros cargados en un componente client-only para evitar
+      cualquier referencia a `window` durante SSR que pueda causar
+      diferencias de HTML en la hidratación. */}
+        <ThirdPartyScripts />
       </body>
     </html>
   );
