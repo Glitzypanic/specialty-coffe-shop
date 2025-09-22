@@ -35,7 +35,7 @@ export default function ProductCard({ product }: ProductCardProps) {
   const { addToCart } = useCart();
 
   return (
-    <article className="border border-gray-200 bg-white rounded-lg shadow-md hover:shadow-lg transition-all duration-300">
+    <article className="border  border-gray-200 bg-white rounded-lg shadow-md hover:shadow-lg transition-all duration-300">
       <Link
         href={`/products/${product._id}`}
         aria-label={`Ver detalles de ${product.name}`}
@@ -67,13 +67,15 @@ export default function ProductCard({ product }: ProductCardProps) {
           </p>
         </div>
       </Link>
-      <button
-        onClick={() => addToCart(product)}
-        className="w-full bg-coffee text-white py-2 rounded-b-md hover:bg-coffee/90 focus:outline-none focus:ring-2 focus:ring-coffee focus:ring-opacity-50 transition-colors duration-200"
-        aria-label={`Añadir ${product.name} al carrito`}
-      >
-        Añadir al carrito
-      </button>
+      <div className="p-4">
+        <button
+          onClick={() => addToCart(product)}
+          className="w-full justify-center bg-green-500 text-white py-2 rounded-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-opacity-50 cursor-pointer"
+          aria-label={`Añadir ${product.name} al carrito`}
+        >
+          Añadir al carrito
+        </button>
+      </div>
     </article>
   );
 }

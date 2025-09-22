@@ -1,28 +1,39 @@
 // app/products/[id]/page.tsx
-import React from 'react';
+'use client';
+import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
-import { notFound } from 'next/navigation';
-import { connectDB } from '@/lib/db';
-import ProductModel from '@/models/Product';
+import { useRouter } from 'next/navigation';
 import { Product } from '@/types/product';
+import { useCart } from '@/components/ecommerce/CartContext';
 
-async function fetchProduct(id: string): Promise<Product | null> {
-  await connectDB();
-  const product = await ProductModel.findById(id);
-  return product ? (product.toObject() as Product) : null;
-}
+export default function ProductPage({ params }: { params: { id: string } }) {
+  const { id } = params;
+  const { addToCart } = useCart();
+  const router = useRouter();
 
-interface ProductPageProps {
-  params: any;
-}
+  const [product, setProduct] = useState<Product | null>(null);
 
-export default async function ProductPage({
-  params,
-}: ProductPageProps): Promise<React.ReactNode> {
-  const product = await fetchProduct(params.id);
+  useEffect(() => {
+    // Función para recuperar el producto desde la base de datos
+    const fetchProduct = async () => {
+      try {
+        const response = await fetch(`/api/products/${id}`);
+        if (!response.ok) {
+          throw new Error('Producto no encontrado');
+        }
+        const data: Product = await response.json();
+        setProduct(data);
+      } catch (error) {
+        console.error(error);
+        router.push('/404'); // Redirige a una página 404 si el producto no existe
+      }
+    };
+
+    fetchProduct();
+  }, [id, router]);
 
   if (!product) {
-    notFound();
+    return <p>Cargando...</p>; // Muestra un mensaje de carga mientras se recupera el producto
   }
 
   return (
@@ -48,6 +59,7 @@ export default async function ProductPage({
           </p>
           <p className="text-sm text-gray-500">Stock: {product.stock}</p>
           <button
+            onClick={() => addToCart(product)}
             className="mt-6 w-full bg-green-500 text-white py-2 rounded-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-opacity-50"
             aria-label={`Añadir ${product.name} al carrito`}
           >
