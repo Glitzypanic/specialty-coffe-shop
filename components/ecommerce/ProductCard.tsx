@@ -70,7 +70,7 @@ export default function ProductCard({ product }: ProductCardProps) {
       <div className="p-4">
         <button
           onClick={() => addToCart(product)}
-          className="w-full justify-center bg-green-500 text-white py-2 rounded-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-opacity-50 cursor-pointer"
+          className="w-full justify-center bg-green-600 text-white py-2 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-opacity-50 cursor-pointer"
           aria-label={`Añadir ${product.name} al carrito`}
         >
           Añadir al carrito

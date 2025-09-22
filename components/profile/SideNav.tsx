@@ -27,7 +27,7 @@ export default function SideNav() {
   };
 
   return (
-    <nav className="flex flex-col h-full py-8 px-8 gap-4">
+    <nav className="flex flex-col h-[440px] ml-5 mt-5 py-8 px-8 gap-4 border-2 border-gray-200 rounded-lg ">
       <Link href="/profile" className={getLinkStyles('/profile')}>
         Mi cuenta
       </Link>
@@ -38,7 +38,7 @@ export default function SideNav() {
       <button
         type="button"
         onClick={() => signOut({ callbackUrl: '/' })}
-        className="w-full flex items-center gap-2 p-2 rounded bg-red-100 hover:bg-red-200 text-red-700 font-semibold"
+        className="w-full flex items-center justify-center cursor-pointer gap-2 p-2 rounded bg-red-100 hover:bg-red-200 text-red-700 font-semibold"
       >
         Cerrar sesión
       </button>

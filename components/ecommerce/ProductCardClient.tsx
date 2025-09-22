@@ -57,23 +57,25 @@ export default function ProductCardClient({ product }: ProductCardProps) {
             <ProductImagePlaceholder name={product.name} />
           )}
         </div>
-        <div className="p-4">
+        <div className="p-2">
           <h2 className="text-lg font-semibold text-gray-800">
             {product.name}
           </h2>
-          <p className="text-sm text-gray-600">{product.description}</p>
-          <p className="text-lg font-bold text-green-600 mt-2">
-            ${product.price}
+          <p className="text-sm text-gray-400 font-semibold  h-10">
+            {product.description}
           </p>
+          <p className="text-2xl font-bold text-green-600">${product.price}</p>
         </div>
       </Link>
-      <button
-        onClick={() => addToCart(product)}
-        className="w-full bg-coffee text-white py-2 rounded-b-md hover:bg-coffee/90 focus:outline-none focus:ring-2 focus:ring-coffee focus:ring-opacity-50 transition-colors duration-200"
-        aria-label={`Añadir ${product.name} al carrito`}
-      >
-        Añadir al carrito
-      </button>
+      <div className="p-2">
+        <button
+          onClick={() => addToCart(product)}
+          className="w-full justify-center bg-green-600 text-white py-2 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-opacity-50 cursor-pointer"
+          aria-label={`Añadir ${product.name} al carrito`}
+        >
+          Añadir al carrito
+        </button>
+      </div>
     </article>
   );
 }
