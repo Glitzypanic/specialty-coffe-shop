@@ -2,6 +2,7 @@
 
 import Image from 'next/image';
 import { useState } from 'react';
+import { FiEdit2 } from 'react-icons/fi'; // Icono de edición
 
 interface AccountSectionProps {
   user: {
@@ -18,11 +19,12 @@ export default function AccountSection({ user }: AccountSectionProps) {
     email: user.email || '',
     phone: user.phone || '',
   });
-  const [display, setDisplay] = useState({
-    name: user.name || '',
-    email: user.email || '',
-    phone: user.phone || '',
+  const [editableFields, setEditableFields] = useState({
+    name: false,
+    email: false,
+    phone: false,
   });
+  const [isEditing, setIsEditing] = useState(false); // Nuevo estado para controlar si se está editando
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState('');
   const [error, setError] = useState('');
@@ -31,12 +33,20 @@ export default function AccountSection({ user }: AccountSectionProps) {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
+  const toggleEditable = (field: keyof typeof editableFields) => {
+    const updatedEditableFields = {
+      ...editableFields,
+      [field]: !editableFields[field],
+    };
+    setEditableFields(updatedEditableFields);
+    setIsEditing(Object.values(updatedEditableFields).some((value) => value)); // Verifica si algún campo está en modo edición
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setSuccess('');
     setError('');
-    // Validación de formato de teléfono internacional (ej: +52 1234567890)
     const phoneRegex = /^\+\d{1,3}\s?\d{6,14}$/;
     if (!phoneRegex.test(form.phone)) {
       setError(
@@ -56,7 +66,8 @@ export default function AccountSection({ user }: AccountSectionProps) {
         throw new Error(result.error || 'Error al actualizar');
       }
       setSuccess('Datos actualizados correctamente');
-      setDisplay({ ...form }); // Actualiza los datos mostrados inmediatamente
+      setEditableFields({ name: false, email: false, phone: false }); // Desactiva todos los campos
+      setIsEditing(false); // Desactiva el estado de edición
     } catch (err) {
       if (err instanceof Error) {
         setError(err.message || 'Error al actualizar');
@@ -80,79 +91,53 @@ export default function AccountSection({ user }: AccountSectionProps) {
             className="w-16 h-16 rounded-full border"
           />
         )}
-        <div className="flex flex-col w-full">
-          <div className="flex flex-row gap-4">
-            <div className="font-semibold text-lg">Nombre:</div>
-            <div className="text-gray-400 text-xl">{display.name}</div>
-          </div>
-          <div className="flex flex-row gap-4 ">
-            <div className="font-semibold text-lg">Correo:</div>
-            <div className="text-gray-400 text-xl">{display.email}</div>
-          </div>
-          <div className="flex flex-row gap-4">
-            <div className="font-semibold text-lg">Telefono:</div>
-            <div className="text-gray-400 text-xl">{display.phone}</div>
-          </div>
-        </div>
       </div>
       <form onSubmit={handleSubmit} className="space-y-4 max-w-sm">
-        <div>
-          <label
-            htmlFor="name"
-            className="block text-sm font-medium text-gray-400"
-          >
-            Nombre
-          </label>
-          <input
-            type="text"
-            name="name"
-            id="name"
-            value={form.name}
-            onChange={handleChange}
-            className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
-            required
-          />
-        </div>
-        <div>
-          <label
-            htmlFor="email"
-            className="block text-sm font-medium text-gray-400"
-          >
-            Correo Electrónico
-          </label>
-          <input
-            type="email"
-            name="email"
-            id="email"
-            value={form.email}
-            onChange={handleChange}
-            className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
-            required
-          />
-        </div>
-        <div>
-          <label
-            htmlFor="phone"
-            className="block text-sm font-medium text-gray-400"
-          >
-            Teléfono
-          </label>
-          <input
-            type="text"
-            name="phone"
-            id="phone"
-            value={form.phone}
-            onChange={handleChange}
-            className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
-            required
-          />
-        </div>
+        {['name', 'email', 'phone'].map((field) => (
+          <div key={field} className="relative items-center">
+            <label
+              htmlFor={field}
+              className="block text-sm font-medium text-gray-400"
+            >
+              {field === 'name'
+                ? 'Nombre'
+                : field === 'email'
+                ? 'Correo Electrónico'
+                : 'Teléfono'}
+            </label>
+            <div className="flex items-center">
+              <input
+                type={field === 'email' ? 'email' : 'text'}
+                name={field}
+                id={field}
+                value={form[field as keyof typeof form]}
+                onChange={handleChange}
+                disabled={!editableFields[field as keyof typeof editableFields]}
+                className={`mt-1 block w-full p-2 border border-gray-300 rounded-md ${
+                  editableFields[field as keyof typeof editableFields]
+                    ? 'bg-white'
+                    : 'bg-gray-100'
+                }`}
+                required
+              />
+              <button
+                type="button"
+                onClick={() =>
+                  toggleEditable(field as keyof typeof editableFields)
+                }
+                className="absolute right-2 cursor-pointer text-gray-500 hover:text-gray-700"
+              >
+                <FiEdit2 />
+              </button>
+            </div>
+          </div>
+        ))}
         <button
           type="submit"
-          disabled={loading}
-          className="w-full bg-coffee text-white py-2 rounded-md hover:bg-coffee-dark focus:outline-none focus:ring-2 focus:ring-coffee focus:ring-opacity-50 disabled:bg-gray-400 cursor-pointer j"
+          disabled={!isEditing || loading} // Desactivado si no se está editando
+          className="w-full bg-green-600 text-white py-2 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-coffee focus:ring-opacity-50 disabled:bg-gray-400 cursor-pointer"
         >
-          {loading ? 'Guardando...' : 'Guardar cambios'}
+          {loading ? 'Guardando...' : 'Aplicar cambios'}
         </button>
         {success && <p className="text-green-600 text-center">{success}</p>}
         {error && <p className="text-red-600 text-center">{error}</p>}
