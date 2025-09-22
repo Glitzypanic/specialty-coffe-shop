@@ -1,4 +1,4 @@
-module.exports = {
+export default {
   purge: [],
   darkMode: false, // or 'media' or 'class'
   theme: {
@@ -8,4 +8,4 @@ module.exports = {
     extend: {},
   },
   plugins: [],
-}
+};
