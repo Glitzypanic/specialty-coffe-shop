@@ -16,7 +16,7 @@ export default function HeaderClient() {
   const isAuthenticated = session?.user ? true : false;
 
   return (
-    <header className="bg-coffee text-cream p-4">
+    <header className="bg-white text-cream p-4 sticky top-0 z-50 shadow-sm">
       <nav className="container mx-auto flex justify-between items-center">
         <Link href="/" className="text-2xl font-bold" aria-label="Inicio">
           Coffee Shop
