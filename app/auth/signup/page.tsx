@@ -200,6 +200,15 @@ export default function SignUpPage() {
         </button>
         {error && <p className="mt-2 text-center text-red-600">{error}</p>}
       </form>
+      <p className="mt-4 text-center text-sm text-gray-600">
+        ¿Ya tienes una cuenta?{' '}
+        <a
+          href="/auth/signin"
+          className="text-coffee font-bold hover:underline"
+        >
+          Inicia sesión aquí
+        </a>
+      </p>
     </main>
   );
 }

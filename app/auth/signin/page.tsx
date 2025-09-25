@@ -7,6 +7,7 @@ import { z } from 'zod';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import Link from 'next/link';
 
 const signInSchema = z.object({
   email: z
@@ -106,6 +107,15 @@ export default function SignInPage() {
         </button>
         {error && <p className="mt-2 text-center text-red-600">{error}</p>}
       </form>
+      <p className="mt-4 text-center text-sm text-gray-600">
+        ¿No tienes una cuenta?{' '}
+        <Link
+          href="/auth/signup"
+          className="text-coffee font-bold hover:underline"
+        >
+          Regístrate aquí
+        </Link>
+      </p>
     </main>
   );
 }

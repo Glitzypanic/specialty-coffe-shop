@@ -69,10 +69,10 @@ export default function Home() {
     <main className="container mx-auto p-4">
       <section className="text-center py-12">
         <h1 className="text-4xl font-bold text-sky-900">
-          Bienvenido a Coffee Shop
+          BrewStack Coffee Shop
         </h1>
         <p className="text-lg text-gray-600 mt-4">
-          Descubre los mejores cafés de especialidad y accesorios.
+          Tu destino para el mejor café y accesorios de calidad
         </p>
         <Link
           href="/products"

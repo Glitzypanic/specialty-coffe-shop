@@ -3,32 +3,32 @@
 
 import Link from 'next/link';
 import { useCart } from '@/components/ecommerce/CartContext';
-import { signIn } from 'next-auth/react';
+import { useSession } from 'next-auth/react';
+import { FaUser, FaShoppingCart } from 'react-icons/fa';
 
-interface SessionUser {
-  name?: string;
-  email?: string;
-  image?: string;
-  id?: string;
-}
-
-interface Session {
-  user?: SessionUser;
-}
-
-export default function Header({ session }: { session: Session }) {
-  const { cart } = useCart();
+export default function Header() {
+  const { totalItems } = useCart();
+  const { data: session, status } = useSession();
+  const loading = status === 'loading';
   const isAuthenticated = session?.user ? true : false;
 
+  if (loading) {
+    return null; // O un spinner de carga
+  }
+
   return (
-    <header className="bg-coffee text-cream p-4 transition-colors duration-300">
+    <header className="bg-white text-cream p-4 sticky top-0 z-50 shadow-sm">
       <nav className="container mx-auto flex justify-between items-center">
         <Link href="/" className="text-2xl font-bold" aria-label="Inicio">
-          Coffee Shop
+          Code & Brew
         </Link>
-
         <div className="flex items-center space-x-4">
           <ul className="flex space-x-4">
+            <li>
+              <Link href="/" className="hover:underline" aria-label="Inicio">
+                Inicio
+              </Link>
+            </li>
             <li>
               <Link
                 href="/products"
@@ -40,39 +40,34 @@ export default function Header({ session }: { session: Session }) {
             </li>
             <li>
               <Link
-                href="/cart"
+                href="/blog"
                 className="hover:underline"
-                aria-label="Carrito"
+                aria-label="Sobre Nosotros"
               >
-                Carrito ({cart.length})
+                Sobre Nosotros
+              </Link>
+            </li>
+          </ul>
+        </div>
+        <div className="flex items-center space-x-4">
+          <ul className="flex space-x-4">
+            <li>
+              <Link
+                href={isAuthenticated ? '/profile' : '/auth/signin'}
+                aria-label="Mi cuenta"
+              >
+                <FaUser size={20} />
               </Link>
             </li>
             <li>
-              {isAuthenticated ? (
-                <Link
-                  href="/profile"
-                  className="hover:underline text-cream"
-                  aria-label="Mi cuenta"
-                >
-                  Mi cuenta
-                </Link>
-              ) : (
-                <>
-                  <button
-                    onClick={() => signIn()}
-                    className="hover:underline text-cream mr-2"
-                    aria-label="Iniciar sesión"
-                  >
-                    Iniciar Sesión
-                  </button>
-                  <Link
-                    href="/auth/signup"
-                    className="hover:underline text-cream"
-                  >
-                    Registrarse
-                  </Link>
-                </>
-              )}
+              <Link
+                href="/cart"
+                className="text-cream flex items-center"
+                aria-label="Carrito"
+              >
+                <FaShoppingCart size={20} />
+                <span className="ml-1">{totalItems}</span>
+              </Link>
             </li>
           </ul>
         </div>
